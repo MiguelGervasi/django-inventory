@@ -1,0 +1,179 @@
+<!-- next thing to do is add the autocomplete -->
+
+{% extends "inventory/base.html" %}
+<!-- {% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_available_languages as LANGUAGES %}
+ -->
+{% block content_head %}
+
+
+  <div class="page-header">
+    <h1>
+    Inventory
+  </h1>
+
+  </div>
+
+    <div class="btn-group" style="padding: 0 0 0 5px;float:right;">
+      <a class="btn dropdown-toggle btn-primary" data-toggle="dropdown" href="#">Action
+        <span class="caret"></span>
+      </a>
+      <ul class="dropdown-menu ">
+
+    <li><a href="#" data-toggle="modal"
+            data-target="#myModal1">Add Product</a></li>
+    <li><a type="button" data-toggle="modal"
+            data-target="#myModal2">Add Category</a></li>
+    <li><a type="button" data-toggle="modal"
+            data-target="#myModal3">Add Inventory</a></li>
+    <li><a href="#!" id="action_delete">Delete Product</a></li>
+              </ul>
+    </div>
+
+<div class="btn-group" style="float:right;">
+  <a class="btn dropdown-toggle btn-primary" data-toggle="dropdown" href="#">View
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu">
+    <li><a href="#!" id="select_view">Select View</a></li>
+    <li><a href="#!" id="update_view">Update View</a></li>
+    <li><a href="#!" id="delete_view">Delete View</a></li>
+
+  </ul>
+</div>
+
+<div class="modal hide fade" id="myModal1" tabindex="-1" role="dialog"
+     aria-labelledby="myModal1Label" aria-hidden="true" style="display: none">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModal1Label">Product Information</h3>
+  </div>
+  <div class="modal-body">
+    <form method="POST" action="{% url 'inventory:prod_form_view_url' %}">
+    <fieldset>
+      {% csrf_token %}
+    
+    <div style="float:left;">
+    {{ product_form.management_form }}
+      {{ product_form.as_table }}
+    </div><div style="padding:0 0 0 25px;float:left;">
+    {{ formset.management_form }}
+      {{ formset.as_table }}
+     </div> 
+      </fieldset>
+    
+    <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+      <input type="submit" value="Submit" class="btn btn-primary"/>
+    </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- Add Category -->
+
+<div class="modal hide fade" id="myModal2" tabindex="-1" role="dialog"
+     aria-labelledby="myModal2Label" aria-hidden="true" style="display: none">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModal2Label">Add Category</h3>
+  </div>
+  <div class="modal-body">
+    <form method="POST" action="{% url 'inventory:cat_form_view_url' %}" >    
+    <fieldset>
+      {% csrf_token %}
+      {{ cat_form.management_form }}
+       {{ cat_form.as_table }}
+    <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+      <input type="submit" value="Submit" class="btn btn-primary"/>
+    </div>
+  </fieldset>
+    </form>
+  </div>
+</div>
+
+<!-- Add Inventory -->
+
+
+<div class="modal hide fade" id="myModal3" tabindex="-1" role="dialog"
+     aria-labelledby="myModal3Label" aria-hidden="true" style="display: none">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModal3Label">Inventory Information</h3>
+  </div>
+  <div class="modal-body">
+    <form method="POST" action="{% url 'inventory:inv_form_view_url' %}" >
+    <fieldset>
+      {% csrf_token %}
+      {{ inv_form.management_form }}
+      {{ inv_form.as_table }}
+    <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+      <input type="submit" value="Submit" class="btn btn-primary"/>
+    </div>
+  </fieldset>
+    </form>
+  </div>
+</div>
+
+
+<ul class="nav nav-tabs">
+  <li class="active">
+    <a href="/inventory/">Home</a>
+  </li>
+  <li><a href="/inventory/reports" id="mv">Reports</a></li>
+</ul>
+
+
+
+{% endblock %}
+
+{% block content %}
+
+
+<div id="switch">
+{% include 'inventory/product_select_view.html' %}
+</div>
+
+
+<script>
+
+$("#action_delete").click(function(e){ 
+$("#myform").submit();
+
+});
+
+$("#select_view").click(function(e){ 
+$.ajax({
+    url: "{% url 'inventory:product_select_view' %}",
+    success: function(data) {
+        $("#switch").html(data);
+    }
+  });
+});
+
+$("#update_view").click(function(e){ 
+$.ajax({
+    url: "{% url 'inventory:product_update_view' %}",
+    success: function(data) {
+        $("#switch").html(data);
+    }
+  });
+});
+
+$("#delete_view").click(function(e){ 
+$.ajax({
+    url: "{% url 'inventory:product_delete_view' %}",
+    success: function(data) {
+        $("#switch").html(data);
+    }
+  });
+});
+
+</script>
+
+
+{% endblock %}

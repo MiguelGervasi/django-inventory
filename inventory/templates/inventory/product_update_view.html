@@ -1,0 +1,528 @@
+{% if inventory_product %}
+    <table id="myTable" class="table table-bordered tablesorter-bootstrap table-condensed">
+    	<thead>
+    	<tr align="left">
+	    	<th>Inventory</th>
+        <th>Product</th>
+	    	<th>Quantity In Stock</th>
+	    	<th>Quantity Sold</th>
+	    </tr>
+	</thead>
+	<tbody>
+
+	    {% for v in inventory_product %}
+ 	    	<tr>
+
+          <td><a href="#" id="inventory{{ v.id }}" data-type="select" data-pk="{{ v.id }}" data-url="{% url 'inventory:ajax_post' v.id %}" data-original-title="Inventory" data-source="[{% for x in allinv %}{value: {{ x.id }}, text: '{{ x.inventory_name }}'},{% endfor %}]" params="{ csrfmiddlewaretoken : '{% csrf_token %}'"} data-value="{{ v.inventory.id }}">{{ v.inventory }}</a></td>
+
+	    		<td><a href="#" data-pk="{{ v.id }}" data-type="product" class="content" id="product{{ v.id }}">{{ v.product }}</a>
+          </td>
+
+	    		<td>
+          <div id="left{{ v.id }}" style="padding: 1px;float:left;"><a href="#" id="qis{{ v.id }}" data-type="text" data-pk="{{ v.id }}" data-url="{% url 'inventory:ajax_post' v.id %}" rel="tooltip" title="Update Stock Value" data-original-title="Quantity in Stock" params="{ csrfmiddlewaretoken : '{% csrf_token %}'"}>{{ v.quantity_on_hand }}</a></div>
+          <div class="status{{ v.id }}" rel="tooltip" title="Add to Stock Value" style="padding:  1px;float:right;" id="status{{ v.id }}"></div>
+          </td>
+
+
+	    		<td>
+          <a href="#" id="qs{{ v.id }}" data-type="text" data-pk="{{ v.id }}" data-url="{% url 'inventory:ajax_post' v.id %}" rel="tooltip" title="Update Sales Value" data-original-title="Quantity Sold" params="{ csrfmiddlewaretoken : '{% csrf_token %}'"}>{{ v.quantity_sold }}</a>
+          </td>
+
+          
+
+	    	</tr>
+
+        <script>
+        function update_stock_status(num)
+        {
+
+          if(num <= 20 && num > 0)
+          {
+            $('#status{{v.id}}').html("<div class='label label-warning' align='right'>Low Supply</div>");
+          }
+          else if(num <= 0)
+          {
+            $('#status{{v.id}}').html("<div class='label label-important' align='right'>Out of Stock</div>");
+          }
+          else if(num > 20)
+          {
+            $('#status{{v.id}}').html("<div class='label label-success' float='right'>In Stock</div>");
+          }
+
+        }
+        </script>
+
+        <script>
+
+
+//automation complete
+// $(document).ready(function() {
+
+//  var num = {{ v.quantity_on_hand }}
+
+//   if(num <= 20 && num > 0)
+//   {
+//     $('#status{{v.id}}').html("<div class='label label-warning' align='right'>Restock Soon</div>");
+//   }
+//   else if(num == 0)
+//   {
+//     $('#status{{v.id}}').html("<div class='label label-important' align='right'>Restock</div>");
+//   }
+//   else if(num > 20)
+//   {
+//     $('#status{{v.id}}').html("<div class='label label-success' float='right'>In Stock</div>");
+//   }
+
+//  }); 
+
+
+$(document).ready(update_stock_status({{ v.quantity_on_hand }}));
+
+
+
+//possible makeup for productedit x-editable for custominput
+(function ($) {
+    "use strict";
+
+    var Product = function (options) {
+        this.sourceCountryData = options.sourceCountry;
+        this.init('product', options, Product.defaults);
+    };
+
+    //inherit from Abstract input
+    $.fn.editableutils.inherit(Product, $.fn.editabletypes.abstractinput);
+
+    $.extend(Product.prototype, {
+
+        render: function () {
+            this.$input = this.$tpl.find('input');
+            this.$list = this.$tpl.find('select');
+
+            this.$list.empty();
+
+            var fillItems = function ($el, data) {
+                if ($.isArray(data)) {
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].children) {
+                            $el.append(fillItems($('<optgroup>', {
+                                label: data[i].text
+                            }), data[i].children));
+                        } else {
+                            $el.append($('<option>', {
+                                value: data[i].value
+                            }).text(data[i].text));
+                        }
+                    }
+                }
+                return $el;
+            };
+
+            fillItems(this.$list, this.sourceCountryData);
+
+
+        },
+
+        value2html: function (value, element) {
+            if (!value) {
+                $(element).empty();
+                return;
+            }
+            var catText = value.product_category;
+            $.each(this.sourceCountryData, function (i, v) {
+                if (v.value == catText) {
+                    catText = v.text.toUpperCase();
+                }
+            });
+            // var html = $('<div>').text(value.product_name).html() + ' / ' + $('<div>').text(catText).html();
+            // $(element).html(html);
+            var html = $('<div>').text(value.product_name).html();
+                        $(element).html(html);
+
+        },
+
+        html2value: function (html) {
+            return null;
+        },
+
+        value2str: function (value) {
+            var str = '';
+            if (value) {
+                for (var k in value) {
+                    str = str + k + ':' + value[k] + ';';
+                }
+            }
+            return str;
+        },
+
+        str2value: function (str) {
+            return str;
+        },
+
+        value2input: function (value) {
+            if (!value) {
+                return;
+            }
+            this.$input.filter('[name="product_name"]').val(value.product_name);
+            this.$input.filter('[name="product_unit_price"]').val(value.product_unit_price);
+            this.$input.filter('[name="product_sell_price"]').val(value.product_sell_price);
+            this.$input.filter('[name="product_description"]').val(value.product_description);
+
+            this.$list.val(value.product_category);
+        },
+
+        input2value: function () {
+            return {
+                product_name: this.$input.filter('[name="product_name"]').val(),
+                product_unit_price: this.$input.filter('[name="product_unit_price"]').val(),
+                product_sell_price: this.$input.filter('[name="product_sell_price"]').val(),
+                product_description: this.$input.filter('[name="product_description"]').val(),                  
+                product_category: this.$list.val()
+            };
+        },
+
+        activate: function () {
+            this.$input.filter('[name="product_category"]').focus();
+        },
+
+        autosubmit: function () {
+            this.$input.keydown(function (e) {
+                if (e.which === 13) {
+                    $(this).closest('form').submit();
+                }
+            });
+        }
+    });
+
+    Product.defaults = $.extend({}, $.fn.editabletypes.abstractinput.defaults, {
+        tpl: '' +
+            '<div class="editable-location">' +
+            '<label><span>Category: </span><select name="product_category"></select></label>' +
+            '</div>' +
+            '<div class="editable-location">' +
+            '<label><span>Product: </span><input type="text" name="product_name"></label>' +
+            '</div>' +
+            '<div class="editable-location">' +
+            '<label><span>Unit Price: </span><input type="text"  name="product_unit_price"></label>' +
+            '</div>' +
+            '<div class="editable-location">' +
+            '<label><span>Sell Price: </span><input type="text" name="product_sell_price"></label>' +
+            '</div>' +
+            '<div class="editable-location">' +
+            '<label><span>Description: </span><input type="text" name="product_description"></label>' +
+            '</div>',
+
+        inputclass: '',
+        showbuttons: 'bottom', //WHY ISN'T THIS WORKING!!!
+        sourceCountry: []
+    });
+
+    $.fn.editabletypes.product = Product;
+
+}(window.jQuery));
+
+    $('#product{{ v.id }}').editable({
+    url: "{% url 'inventory:ajax_post' v.id %}",
+    title: 'Enter Product Information',
+    showbuttons: 'bottom', //WE SHOULDN'T NEED THIS!
+    // params: 
+    // {
+    //   csrfmiddlewaretoken: 'csrf_token'
+    // },
+    value: {
+        product_category: "{{ v.product.product_category }}",
+        product_name: "{{ v.product.product_name }}",
+        product_unit_price: "{{ v.product.product_unit_price }}",
+        product_sell_price: "{{ v.product.product_sell_price }}",
+        product_description: "{{ v.product.product_description }}"
+    },
+    sourceCountry: 
+        [
+          {% for x in allcats %}
+          {
+            value: "{{ x.product_category }}",
+            text: "{{ x.product_category }}"
+          },
+          {% endfor %}
+        ]
+});
+
+//ajax emulation
+// $.mockjax({
+//     url: '/post',
+//     responseTime: 400,
+//     response: function (settings) {
+//         if (settings.data.value == 'err') {
+//             this.status = 500;
+//             this.responseText = 'Server-side error';
+//         } else {
+//             this.responseText = {
+//                 success: true
+//             };
+//         }
+//     }
+// });
+
+
+
+
+
+
+
+
+
+
+//     $('#message{{v.id}}').html("<div id='message' class='alert alert-success'><button type='button' class='close' data-dismiss='alert'>x</button>Product Updated!</div>")
+//     .hide()  
+//     .fadeIn(1500, function() { 
+//     });  
+
+// $('#message{{v.id}}').delay(2000).fadeOut("slow", function () {  });
+
+
+</script>
+
+
+
+<script>
+
+function getCookie(name) {
+  var cookieValue = null;
+  if (document.cookie && document.cookie != '') {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = jQuery.trim(cookies[i]);
+          // Does this cookie string begin with the name we want?
+          if (cookie.substring(0, name.length + 1) == (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    function csrfSafeMethod(method) {
+  // these HTTP methods do not require CSRF protection
+  return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({ 
+ // remove data line if this doesn't work anymore
+ data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+ beforeSend: function(xhr, settings) {
+   function getCookie(name) {
+     var cookieValue = null;
+     if (document.cookie && document.cookie != '') {
+       var cookies = document.cookie.split(';');
+       for (var i = 0; i < cookies.length; i++) {
+         var cookie = jQuery.trim(cookies[i]);
+                   // Does this cookie string begin with the name we want?
+                   if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                     break;
+                   }
+                 }
+               }
+               return cookieValue;
+             }
+             if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+           // Only send the token to relative URLs i.e. locally.
+           xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+         }
+       } 
+     });
+
+
+                
+    	    //$.fn.editable.defaults.mode = 'inline';
+					$('#qs{{ v.id }}').editable();
+          $('#qis{{ v.id }}').editable({
+          success: function(data) {
+              var num = data.qis;
+              if(num <= 20 && num > 0)
+              {
+                $('#status{{v.id}}').html("<div class='label label-warning' align='right'>Low Supply</div>");
+              }
+              else if(num == 0)
+              {
+                $('#status{{v.id}}').html("<div class='label label-important' align='right'>Out of Stock</div>");
+              }
+              else if(num > 20)
+              {
+                $('#status{{v.id}}').html("<div class='label label-success' float='right'>In Stock</div>");
+              }
+          },     
+
+          });           
+          
+          $('#inventory{{ v.id }}').editable();
+					$('#quantity_sold{{ v.id }}').editable({
+          success: function(data) {
+
+              // $('#sold{{ v.id }}').html(data.quantity_sold)
+              // $('#quantity_on_hand{{ v.id }}').html(data.quantity_on_hand)
+              // var num = data.quantity_on_hand;
+              // if(num <= 20 && num > 0)
+              // {
+              //   $('#status{{v.id}}').html("<div class='label label-warning' align='right'>Low Supply</div>");
+              // }
+              // else if(num == 0)
+              // {
+              //   $('#status{{v.id}}').html("<div class='label label-important' align='right'>Out of Stock</div>");
+              // }
+              // else if(num > 20)
+              // {
+              //   $('#status{{v.id}}').html("<div class='label label-success' float='right'>In Stock</div>");
+              // }
+                // alert('Load was performed' + data.quantity_on_hand);
+              location.reload(true); //reload page and solve all problems
+              
+          },
+
+          display: function(value) {
+              //keep this so current div element will not change
+
+          }
+                  
+
+          });
+
+          $('#quantity_on_hand{{ v.id }}').editable({
+          success: function(response, newValue) {
+
+             // var num = newValue
+
+             //  if(num <= 20 && num > 0)
+             //  {
+             //    $('#status{{v.id}}').html("<div class='label label-warning' align='right'>Low Supply</div>");
+             //  }
+             //  else if(num == 0)
+             //  {
+             //    $('#status{{v.id}}').html("<div class='label label-important' align='right'>Out of Stock</div>");
+             //  }
+             //  else if(num > 20)
+             //  {
+             //    $('#status{{v.id}}').html("<div class='label label-success' float='right'>In Stock</div>");
+             //  }
+
+             //  if(response.status == 'error') return response.msg; //msg will be shown in 
+
+             location.reload(true);
+
+            },
+
+
+          display: function(value) {
+              //keep this so current div element will not change
+
+          }
+
+
+          });
+
+
+
+
+				</script>
+ 
+	    {% endfor %}
+
+        </tbody>
+    </table>
+
+<div id="pager" class="pager">
+  <form>
+    <img src="{{ STATIC_URL }}bootstrap/images/first.png" class="first"/>
+    <img src="{{ STATIC_URL }}bootstrap/images/prev.png" class="prev"/>
+    <input type="text" class="pagedisplay"/>
+    <img src="{{ STATIC_URL }}bootstrap/images/next.png" class="next"/>
+    <img src="{{ STATIC_URL }}bootstrap/images/last.png" class="last"/>
+    <select class="pagesize">
+      <option value="">>LIMIT</option>
+      <option value="2">2 per page</option>
+      <option value="5">5 per page</option>
+      <option value="10">10 per page</option>
+      
+    </select>
+  </form>
+</div>
+
+
+{% else %}
+    <p>No Products are available.</p>
+{% endif %}
+
+
+<script>
+
+//look at this code when you get back
+$(function() {
+
+  $.extend($.tablesorter.themes.bootstrap, {
+    // these classes are added to the table. To see other table classes available,
+    // look here: http://twitter.github.com/bootstrap/base-css.html#tables
+    table      : 'table table-bordered',
+    header     : 'bootstrap-header', // give the header a gradient background
+    footerRow  : '',
+    footerCells: '',
+    icons      : '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
+    sortNone   : 'bootstrap-icon-unsorted',
+    sortAsc    : 'icon-chevron-up',
+    sortDesc   : 'icon-chevron-down',
+    active     : '', // applied when column is sorted
+    hover      : '', // use custom css here - bootstrap class may not override it
+    filterRow  : '', // filter row class
+    even       : '', // odd row zebra striping
+    odd        : ''  // even row zebra striping
+  });
+
+  // call the tablesorter plugin and apply the uitheme widget
+  $("#myTable").tablesorter({
+    // this will apply the bootstrap theme if "uitheme" widget is included
+    // the widgetOptions.uitheme is no longer required to be set
+    theme : "bootstrap",
+
+    widthFixed: true,
+
+    headerTemplate : '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
+
+    // widget code contained in the jquery.tablesorter.widgets.js file
+    // use the zebra stripe widget if you plan on hiding any rows (filter widget)
+    widgets : [ "uitheme", "filter", "zebra" ],
+
+    widgetOptions : {
+      // using the default zebra striping class name, so it actually isn't included in the theme variable above
+      // this is ONLY needed for bootstrap theming if you are using the filter widget, because rows are hidden
+      zebra : ["even", "odd"],
+
+      // reset filters button
+      filter_reset : ".reset"
+
+      // set the uitheme widget to use the bootstrap theme class names
+      // this is no longer required, if theme is set
+      // ,uitheme : "bootstrap"
+
+    }
+  })
+  .tablesorterPager({
+
+    // target the pager markup - see the HTML block below
+    container: $("#pager"),
+
+    // target the pager page select dropdown - choose a page
+    cssGoto  : ".pagenum",
+
+    // remove rows from the table to speed up the sort of large tables.
+    // setting this to false, only hides the non-visible rows; needed if you plan to add/remove rows with the pager enabled.
+    removeRows: false,
+
+    // output string - default is '{page}/{totalPages}';
+    // possible variables: {page}, {totalPages}, {filteredPages}, {startRow}, {endRow}, {filteredRows} and {totalRows}
+    output: '{startRow} - {endRow} / {filteredRows} ({totalRows})'
+
+  });
+
+});
+
+
+</script>

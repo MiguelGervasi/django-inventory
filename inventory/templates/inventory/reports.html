@@ -1,0 +1,88 @@
+{% extends "inventory/base.html" %}
+
+{% block extra_head %}
+
+  <script src="{{ STATIC_URL }}highcharts/js/highcharts.js"></script>
+  <script src="{{ STATIC_URL }}highcharts/js/modules/exporting.js"></script>
+  <script src="{{ STATIC_URL }}highcharts/js/highcharts-more.js"></script>
+  <script src="{{ STATIC_URL }}highcharts/js/adapters/mootools-adapter.js"></script>
+  <script src="{{ STATIC_URL }}highcharts/js/highcharts.src.js"></script>
+
+{% endblock %}
+
+{% block content_head %}
+
+<div class="page-header">
+<h1>Inventory</h1>
+</div>
+
+      <div class="btn-group" style="float:right;">
+      <a class="btn dropdown-toggle btn-primary" data-toggle="dropdown" href="#">
+        Action
+        <span class="caret"></span>
+      </a>
+      <ul class="dropdown-menu ">
+    <li>
+    <a href="#!" id="tableview">View in Table Mode</a>
+    <a href="#!" id="chartview">View in Chart Mode</a>
+   <form id="gen_form" action="{% url 'inventory:reports_generate' %}" method="POST">
+       {% csrf_token %}
+        <a href="#!" id="gen_link">Generate Reports</a>
+        </form>
+    </li>
+    </div>
+
+
+<ul class="nav nav-tabs">
+  <li>
+    <a href="/inventory/">Home</a>
+  </li>
+  <!-- <li><a href="#">Orders</a></li> -->
+  <li class="active"><a href="/inventory/reports/">Reports</a></li>
+</ul>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div id="switch">
+{% include 'inventory/report_table_view.html' %}
+</div>
+
+<script>
+$("#gen_link").click(function(e){ 
+$('#gen_form').submit();return false;
+
+});
+
+$("#tableview").click(function(e){ 
+$.ajax({
+    url: "{% url 'inventory:report_table_view' %}",
+    data: {
+    data_view : "table_view"    
+    },
+    success: function(data) {
+        $("#switch").html(data);
+    }
+  });
+
+});
+
+
+$("#chartview").click(function(e){ 
+$.ajax({
+    url: "{% url 'inventory:report_chart_view' %}",
+    data: {
+    data_view : "chart_view"    
+    },
+    success: function(data) {
+        $("#switch").html(data);
+    }
+  });
+
+});
+</script>
+
+ {% endblock %}

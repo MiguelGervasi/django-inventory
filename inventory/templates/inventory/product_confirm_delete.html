@@ -1,0 +1,34 @@
+{% extends 'inventory/base.html' %}
+
+{% block content %}
+    
+{% if object %}
+<form id="del_form1" action="{% url 'inventory:delete_product' %}" method="POST">{% csrf_token %}
+
+    {% for o in object %}
+    <li>Are you sure you want to delete: "{{ o }}"?</li>
+    {% endfor %}
+    <br>
+    <input type="hidden" id="list" value="{{ object }}">
+    <input type="submit" value="Submit">
+    <!-- <a class="btn" id="sub" class="btn">Submit</a> -->
+    <a class="btn" href="/inventory/">Cancel</a> 
+</form>
+
+{% else %}
+	No Products were Selected!
+{% endif %}
+
+<!-- 
+<script>
+
+$("#sub").click(function(e){ 
+$("#del_form1").submit();
+
+});
+
+</script>
+
+
+ -->
+{% endblock %}

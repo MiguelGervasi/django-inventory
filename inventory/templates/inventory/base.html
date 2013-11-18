@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<!-- {% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_available_languages as LANGUAGES %}
+ -->
+{% load bootstrap_toolkit %}
+<html lang="en">
+
+<link href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" rel="stylesheet">
+
+<head>
+    <meta charset="utf-8">
+    <title>django-bootstrap-toolkit = Bootstrap support for Django</title>
+    <meta name="description" content="">
+    <meta name="author" content="Dylan Verheul">
+    {% bootstrap_stylesheet_tag %}
+    {% bootstrap_stylesheet_tag "responsive" %}
+    <style type="text/css">
+        body {
+            padding-top: 60px;
+        }
+
+
+        .btn-custom {
+          background-color: hsl(0, 69%, 22%) !important;
+          background-repeat: repeat-x;
+          filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#b42121", endColorstr="#5e1111");
+          background-image: -khtml-gradient(linear, left top, left bottom, from(#b42121), to(#5e1111));
+          background-image: -moz-linear-gradient(top, #b42121, #5e1111);
+          background-image: -ms-linear-gradient(top, #b42121, #5e1111);
+          background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #b42121), color-stop(100%, #5e1111));
+          background-image: -webkit-linear-gradient(top, #b42121, #5e1111);
+          background-image: -o-linear-gradient(top, #b42121, #5e1111);
+          background-image: linear-gradient(#b42121, #5e1111);
+          border-color: #5e1111 #5e1111 hsl(0, 69%, 17%);
+          color: #fff !important;
+          text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.33);
+          -webkit-font-smoothing: antialiased;
+        }
+    </style>
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <link href="{{ STATIC_URL }}bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}bootstrap/css/theme.bootstrap.css" rel="stylesheet">
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap-editable/js/bootstrap-editable.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/jquery.tablesorter.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/jquery.tablesorter.widgets.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/jquery.tablesorter.pager.js"></script>
+
+    {% bootstrap_javascript_tag %}
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner ">
+      <div class="container">
+            <a class="brand" href="/">AGUILA EXPRESS</a>
+            <ul class="nav">
+                <li><a href="{% url 'inventory:index' %}" class="">Home</a></li>
+                <li><a href="{% url 'inventory:index' %}">Inventory</a></li>
+                <!-- <li><a href="{% url 'inventory:reports' %}">Reports</a></li> -->
+                
+<!--                 <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Forms<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a class="nav" href="{% url 'inventory:index' %}?layout=vertical">Vertical</a></li>
+                        <li><a href="{% url 'inventory:index' %}?layout=horizontal">Horizontal</a></li>
+                        <li><a href="{% url 'inventory:index' %}?layout=inline">Inline</a></li>
+                        <li><a href="{% url 'inventory:index' %}?layout=search">Search</a></li>
+                        <li><a href="{% url 'inventory:index' %}?layout=horizontal">Using template</a></li>
+                    </ul>
+                </li> -->
+
+
+
+
+<!-- Languages -->
+<!-- <ul class="nav pull-right">
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Language" %}<b class="caret"></b></a>
+        <ul class="dropdown-menu">
+      {% for lang in LANGUAGES %}
+           <form name="setLang{{ lang.1}}" action="/i18n/setlang/" method="POST">{% csrf_token %}
+                    <input name="next" type="hidden" value="/inventory/" />
+                        <input type="hidden" name="language" value="{{ lang.0 }}" />
+                       
+          <li>
+                        <a href="#" onclick="document.setLang{{ lang.1 }}.submit();return false;">{{ lang.1 }}</a>
+                    
+                </li>
+
+                </form>
+            {% endfor %}    
+  </ul>
+    </li>
+</ul>
+ -->
+
+
+
+
+        </div>
+    </div>
+</div>
+
+<!-- <div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span2">
+    <ul class="nav nav-tabs nav-stacked">
+      <li><a href="#">Inventory</a></li>
+      <li><a href="#">Guias</a></li>
+      </ul>
+      </div>
+    </div>
+  </div> -->
+
+<div class="container">
+
+    {% bootstrap_messages %}
+
+    {% block content_head %}{% endblock %}
+
+    {% block content %}Empty page{% endblock %}
+
+    <p><hr></p>
+
+<!--     <footer class="row">
+        <div class="span6">
+            <p>This is <a href="https://github.com/dyve/django-bootstrap-toolkit">django-bootstrap-toolkit</a></p>
+        </div>
+        <div class="span6" style="text-align:right">
+            <p>
+                &copy; <a href="http://twitter.com/dyve">Dylan Verheul</a> 2012
+                |
+                <a href="https://raw.github.com/dyve/django-bootstrap-toolkit/master/LICENSE">license</a>
+            </p>
+        </div>
+    </footer> -->
+
+</div> <!-- container -->
+
+</body>
+</html>
